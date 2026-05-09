@@ -27,6 +27,11 @@ export interface UserInfo {
   email: string;
   role: string;
 }
+interface Room {
+  id: number;
+  name: string;
+  equipment: string[]; // ✅ explicitly an array of strings
+}
 
 export interface ApiResponse<T = any> {
   success: boolean;

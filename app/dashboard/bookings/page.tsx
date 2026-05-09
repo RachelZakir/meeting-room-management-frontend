@@ -607,7 +607,7 @@ export default function BookingsPage() {
     {rooms.map((room) => (
       <option key={room.id} value={room.id}>
         {room.name} (Capacity: {room.capacity}) 
-        {room.equipment && ` - ${typeof room.equipment === 'string' ? JSON.parse(room.equipment).join(', ') : room.equipment.join(', ')}`}
+{Array.isArray(room.equipment) ? room.equipment.join(', ') : room.equipment}
       </option>
     ))}
   </select>
