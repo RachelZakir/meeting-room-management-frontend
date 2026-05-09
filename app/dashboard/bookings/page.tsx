@@ -607,7 +607,9 @@ export default function BookingsPage() {
     {rooms.map((room) => (
       <option key={room.id} value={room.id}>
         {room.name} (Capacity: {room.capacity}) 
-{Array.isArray(room.equipment) ? room.equipment.join(', ') : room.equipment}
+{Array.isArray(room.equipment) 
+  ? room.equipment.join(', ') 
+  : String(room.equipment)}
       </option>
     ))}
   </select>

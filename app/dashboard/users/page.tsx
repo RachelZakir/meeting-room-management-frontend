@@ -8,7 +8,7 @@ import {
   deleteUser,
   createUser,
   getUserRole,
-  User,
+  User as ApiUser,  // Renamed to ApiUser to avoid conflict with lucide-react's User icon
   UpdateUserData,
   CreateUserData
 } from "@/services/api";
@@ -17,7 +17,7 @@ import {
   Trash2, 
   X, 
   Check, 
-  User, 
+  User,  // Keep this as the icon component
   Mail, 
   Shield, 
   Loader2,
@@ -28,6 +28,9 @@ import {
   Plus,
   Lock
 } from "lucide-react";
+
+// Type alias for clarity
+type User = ApiUser;
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -55,46 +58,50 @@ export default function UsersPage() {
   }, []);
 
   const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      if (isAdmin) {
-        console.log("Fetching users list...");
-        const result = await getUsers();
-        console.log("Users API response:", result);
-        
-        if (result.success && result.data) {
-          setUsers(result.data);
-        } else if (Array.isArray(result)) {
-          setUsers(result);
-        } else {
-          setUsers([]);
-        }
+  setLoading(true);
+  setError(null);
+  try {
+    if (isAdmin) {
+      console.log("Fetching users list...");
+      const result = await getUsers();
+      console.log("Users API response:", result);
+      
+      if (result.success && result.data) {
+        setUsers(result.data);
+      } else if (Array.isArray(result)) {
+        setUsers(result);
       } else {
-        const token = localStorage.getItem("accessToken");
-        if (token) {
-          try {
-            const decoded = JSON.parse(atob(token.split(".")[1]));
-            const result = await getUserById(decoded.id);
-            
-            if (result.success && result.data) {
-              setCurrentUser(result.data);
-            } else if (result.id) {
-              setCurrentUser(result as User);
+        setUsers([]);
+      }
+    } else {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        try {
+          const decoded = JSON.parse(atob(token.split(".")[1]));
+          const result = await getUserById(decoded.id);
+          
+          if (result.success && result.data) {
+            setCurrentUser(result.data);
+          } else {
+            // Handle case where response might be directly the user object
+            const responseData = result as any;
+            if (responseData.id && responseData.name && responseData.email) {
+              setCurrentUser(responseData as User);
             }
-          } catch (err) {
-            console.error("Error decoding token:", err);
           }
+        } catch (err) {
+          console.error("Error decoding token:", err);
         }
       }
-    } catch (error: any) {
-      console.error("Error fetching users:", error);
-      setError(error.message || "Failed to load users");
-      toast.error(error.message || "Failed to load users");
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error: any) {
+    console.error("Error fetching users:", error);
+    setError(error.message || "Failed to load users");
+    toast.error(error.message || "Failed to load users");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
@@ -402,7 +409,7 @@ export default function UsersPage() {
                       </div>
                       <span className="font-medium text-gray-900">{user.name}</span>
                     </div>
-                  </td>
+                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-600">{user.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
@@ -412,10 +419,10 @@ export default function UsersPage() {
                     }`}>
                       {user.role}
                     </span>
-                  </td>
+                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-sm">
                     {formatDate(user.createdAt)}
-                  </td>
+                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="flex justify-end gap-2">
                       <button
@@ -440,11 +447,11 @@ export default function UsersPage() {
                         <Trash2 size={18} />
                       </button>
                     </div>
-                  </td>
-                </tr>
+                   </td>
+                 </tr>
               ))}
             </tbody>
-          </table>
+           </table>
           
           {users.length === 0 && (
             <div className="text-center py-12">

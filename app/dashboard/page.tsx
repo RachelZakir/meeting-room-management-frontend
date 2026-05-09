@@ -515,17 +515,28 @@ export default function DashboardPage() {
                             {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
                           </span>
                         </div>
-                        {booking.room?.equipment && (
-                          <div className="flex items-center gap-1.5">
-                            <Video size={14} className="text-blue-400" />
-                            <span className="truncate max-w-md">
-                              {typeof booking.room.equipment === 'string' 
-                                ? JSON.parse(booking.room.equipment).slice(0, 2).join(', ')
-                                : booking.room.equipment.slice(0, 2).join(', ')}
-                              {booking.room.equipment && JSON.parse(booking.room.equipment).length > 2 && '...'}
-                            </span>
-                          </div>
-                        )}
+<span>
+  {(() => {
+    const equipment = booking.room.equipment;
+    
+    if (typeof equipment === 'string') {
+      try {
+        const parsed = JSON.parse(equipment);
+        if (Array.isArray(parsed)) {
+          return (parsed as string[]).slice(0, 2).join(', ');
+        }
+      } catch {
+        return '';
+      }
+    } else if (Array.isArray(equipment)) {
+      return (equipment as string[]).slice(0, 2).join(', ');
+    }
+    return '';
+  })()}
+</span>
+
+
+
                       </div>
                     </div>
                     

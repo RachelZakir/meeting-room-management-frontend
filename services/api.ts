@@ -27,10 +27,13 @@ export interface UserInfo {
   email: string;
   role: string;
 }
+
 interface Room {
-  id: number;
+  id: string;
   name: string;
-  equipment: string[]; // ✅ explicitly an array of strings
+  capacity: number;
+  equipment: string | string[]; // Keep as is
+  isDeleted?: boolean;
 }
 
 export interface ApiResponse<T = any> {
