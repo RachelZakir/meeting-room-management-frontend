@@ -17,12 +17,15 @@ export default function LoginPage() {
     setError("");
     
     try {
-      // ✅ FIXED: Hardcode the URL temporarily to test
-      const baseUrl = "https://meeting-room-management-backend.onrender.com";
+      // ✅ CORRECT - Use the environment variable properly
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
       
-      console.log("API URL:", baseUrl); // Debug log
+      // ✅ CORRECT - Remove any quotes around the variable name
+      const apiUrl = `${baseUrl}/api/auth/login`;
       
-      const response = await fetch(`${baseUrl}/api/auth/login`, {
+      console.log("Fetching URL:", apiUrl); // For debugging
+      
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,10 +33,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      console.log("Response status:", response.status); // Debug log
-      
       const result = await response.json();
-      console.log("Login response:", result);
       
       if (response.ok && result.success) {
         localStorage.setItem("accessToken", result.accessToken);
@@ -43,12 +43,6 @@ export default function LoginPage() {
           localStorage.setItem("userName", result.user.name);
           localStorage.setItem("userEmail", result.user.email);
           localStorage.setItem("userRole", result.user.role);
-          
-          console.log("User data stored:", {
-            name: result.user.name,
-            role: result.user.role,
-            email: result.user.email
-          });
         }
         
         toast.success(`Welcome ${result.user?.name || email.split('@')[0]}!`);
@@ -59,7 +53,7 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error("Login failed:", err);
-      setError(err.message || "An error occurred during login. Please try again.");
+      setError("Failed to connect to server. Please try again.");
       toast.error("Failed to connect to server");
     } finally {
       setLoading(false);
