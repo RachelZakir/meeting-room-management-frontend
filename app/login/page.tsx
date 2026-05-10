@@ -17,15 +17,13 @@ export default function LoginPage() {
     setError("");
     
     try {
-      // ✅ CORRECT - Use the environment variable properly
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      // ✅ HARDCODED URL - Remove environment variable completely
+      const API_URL = "https://meeting-room-management-backend.onrender.com";
       
-      // ✅ CORRECT - Remove any quotes around the variable name
-      const apiUrl = `${baseUrl}/api/auth/login`;
+      console.log("Logging in with:", { email });
+      console.log("API URL:", API_URL);
       
-      console.log("Fetching URL:", apiUrl); // For debugging
-      
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +31,10 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log("Response status:", response.status);
+      
       const result = await response.json();
+      console.log("Response data:", result);
       
       if (response.ok && result.success) {
         localStorage.setItem("accessToken", result.accessToken);
@@ -52,7 +53,7 @@ export default function LoginPage() {
         toast.error(result.message || "Login failed");
       }
     } catch (err: any) {
-      console.error("Login failed:", err);
+      console.error("Login error:", err);
       setError("Failed to connect to server. Please try again.");
       toast.error("Failed to connect to server");
     } finally {
