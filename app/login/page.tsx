@@ -17,7 +17,10 @@ export default function LoginPage() {
     setError("");
     
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      // ✅ FIXED: Hardcode the URL temporarily to test
+      const baseUrl = "https://meeting-room-management-backend.onrender.com";
+      
+      console.log("API URL:", baseUrl); // Debug log
       
       const response = await fetch(`${baseUrl}/api/auth/login`, {
         method: "POST",
@@ -27,14 +30,14 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log("Response status:", response.status); // Debug log
+      
       const result = await response.json();
       console.log("Login response:", result);
       
       if (response.ok && result.success) {
-        // Store access token
         localStorage.setItem("accessToken", result.accessToken);
         
-        // Store user information from the response
         if (result.user) {
           localStorage.setItem("userId", result.user.id);
           localStorage.setItem("userName", result.user.name);
